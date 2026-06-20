@@ -1,0 +1,7 @@
+{
+    "cmake.configureOnOpen": false,
+    "cmake.configureOnEdit": false,
+    "cmake.automaticReconfigure": false,
+    "C_Cpp.default.configurationProvider": "platformio.platformio-ide",
+    "cmake.ignoreCMakeListsMissing": true
+}
