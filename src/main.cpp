@@ -60,30 +60,68 @@ void setup() {
   display.setRotation(1);   // 1 = landscape (296 wide)
   display.setFont(&FreeMonoBold9pt7b);
 
-  // Full-screen refresh: white background, black border, black + red text.
+  // Full-screen refresh: white background, black border, a friendly greeting
+  // on the left, and some fun graphics on the right.
   display.setFullWindow();
   display.firstPage();
   do {
     display.fillScreen(GxEPD_WHITE);
+
+    // Decorative double border (black outer, red inner).
     display.drawRect(2, 2, display.width() - 4, display.height() - 4, GxEPD_BLACK);
+    display.drawRect(5, 5, display.width() - 10, display.height() - 10, GxEPD_RED);
+
+    // ---- Greeting text (left side) ----
+    display.setTextSize(2);                 // 2x the 9pt font
 
     display.setTextColor(GxEPD_BLACK);
-    display.setCursor(12, 30);
-    display.print("Hello, e-ink!");
+    display.setCursor(20, 45);
+    display.print("Hello");
 
     display.setTextColor(GxEPD_RED);
-    display.setCursor(12, 60);
-    display.print("WeAct 2.9 3-color");
+    display.setCursor(20, 80);
+    display.print("Wael!");
 
-    display.setTextColor(GxEPD_BLACK);
-    display.setCursor(12, 90);
-    display.print("ESP32-S3 SPI OK");
+    // little underline flourish under the name
+    display.drawLine(20, 90, 110, 90, GxEPD_BLACK);
 
-    // a small red filled box to confirm the red plane works
-    display.fillRect(220, 70, 60, 40, GxEPD_RED);
+    display.setTextSize(1);
+
+    // ---- Fun graphics (right side) ----
+    // A cheerful smiley "sun" in the upper-right.
+    const int sunX = 235, sunY = 45, sunR = 22;
+    display.fillCircle(sunX, sunY, sunR, GxEPD_RED);   // sun face
+    // sun rays
+    for (int a = 0; a < 360; a += 45) {
+      float rad = a * 3.14159265f / 180.0f;
+      int x1 = sunX + (int)((sunR + 3) * cos(rad));
+      int y1 = sunY + (int)((sunR + 3) * sin(rad));
+      int x2 = sunX + (int)((sunR + 9) * cos(rad));
+      int y2 = sunY + (int)((sunR + 9) * sin(rad));
+      display.drawLine(x1, y1, x2, y2, GxEPD_RED);
+    }
+    // smiley face on the sun (black)
+    display.fillCircle(sunX - 8, sunY - 5, 3, GxEPD_BLACK);  // left eye
+    display.fillCircle(sunX + 8, sunY - 5, 3, GxEPD_BLACK);  // right eye
+    // smile: a short arc made of dots
+    for (int dx = -9; dx <= 9; dx++) {
+      int dy = (int)(0.08f * dx * dx);   // gentle upward smile curve
+      display.drawPixel(sunX + dx, sunY + 8 - dy, GxEPD_BLACK);
+    }
+
+    // A couple of hearts in the lower-right.
+    auto drawHeart = [&](int cx, int cy, int s, uint16_t color) {
+      display.fillCircle(cx - s / 2, cy, s / 2, color);
+      display.fillCircle(cx + s / 2, cy, s / 2, color);
+      display.fillTriangle(cx - s, cy + 1, cx + s, cy + 1,
+                           cx, cy + s + 2, color);
+    };
+    drawHeart(225, 95, 8, GxEPD_RED);
+    drawHeart(255, 105, 6, GxEPD_BLACK);
+    drawHeart(278, 92, 7, GxEPD_RED);
   } while (display.nextPage());
 
-  Serial.println("Done - display should now show black + red text.");
+  Serial.println("Done - display should now greet Wael.");
   display.hibernate();  // low power; image persists with no power
 }
 
